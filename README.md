@@ -34,7 +34,7 @@ bar {
 ## Notes
 - Depends on `iwd`.
 - Assumes your network device is `wlan0`.
-- I ate müsli with avocado while coding this.
+- I ate müsli with avocado while coding this. 🥣🥑
 
 ## License
 MIT
