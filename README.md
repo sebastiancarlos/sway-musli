@@ -35,6 +35,7 @@ bar {
 - Depends on `iwd`.
 - Assumes your network device is `wlan0`.
 - You can take this as a sample code to help you build your personal **ültrafast** Sway status line.
+- See also, [i3status](https://manned.org/i3status.1) and [i3blocks](https://github.com/vivien/i3blocks)
 - I ate müsli with avocado while coding this. 🥣🥑
 
 ## License
