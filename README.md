@@ -34,7 +34,7 @@ bar {
 ## Notes
 - Depends on `iwd`.
 - Assumes your network device is `wlan0`.
-- You can take this as a sample code to help you to build your personal **ültrafast** Sway status line.
+- You can take this as a sample code to help you build your personal **ültrafast** Sway status line.
 - I ate müsli with avocado while coding this. 🥣🥑
 
 ## License
