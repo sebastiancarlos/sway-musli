@@ -1,10 +1,15 @@
-# Sway-MÜSLI: Sway - Minimal Ültrafast Status LIne
+# Sway-MÜSLI: Sway – Minimal Ültrafast Status LIne
 
-# Example
-`MyWiFi | Qwerty | 80% - Charging | Sun 2021-08-22 12:00:00`
+![musli5](https://github.com/sebastiancarlos/sway-musli/assets/88276600/eef1f29a-27db-4a81-ad5d-09c7db590ca8)
+
+## Example
+![sway-musli](https://github.com/sebastiancarlos/sway-musli/assets/88276600/b1c82f5e-b2b7-4176-ae95-da5d6ed42d04)
+
+`MyWiFi | Colemak | 65% - Charging | Fri 2023-12-01 17:01:13`
+
 
 ## Features
-- Written in C for ültra speed.
+- Written in C for **ültra speed**.
 - Minimal features:
     - Shows date and time (even seconds!).
     - Shows battery status.
@@ -12,7 +17,7 @@
 
 ## Installation
 1. Clone the repo and run:
-```
+```bash
 make
 make install # if you want to have the executable in your path
 ```
@@ -29,6 +34,7 @@ bar {
 ## Notes
 - Depends on `iwd`.
 - Assumes your network device is `wlan0`.
+- I ate müsli with avocado while coding this.
 
 ## License
 MIT
