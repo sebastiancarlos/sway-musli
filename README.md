@@ -1,4 +1,4 @@
-# Sway-MÜSLI: Sway – Minimal Ültrafast Status LIne
+# Sway-MÜSLI: Sway – Minimal Ültrafast Status Line
 
 ![musli5](https://github.com/sebastiancarlos/sway-musli/assets/88276600/eef1f29a-27db-4a81-ad5d-09c7db590ca8)
 
