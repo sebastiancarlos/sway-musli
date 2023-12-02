@@ -115,27 +115,34 @@ void send_sway_command(int sockfd, uint32_t command_type, const char *command) {
 
 // A simple function to extract the keyboard layout from the swaymsg command output.
 void extract_keyboard_layout(char *buffer, size_t buffer_size) {
-    int sockfd;
+    static int sockfd = -1;
     struct sockaddr_un addr;
-    const char *socket_path = getenv("SWAYSOCK");
+    static const char *socket_path;
     const char *get_inputs_command = "get_inputs";
     char read_buffer[1024];
     int found = 0;
 
-    sockfd = socket(AF_UNIX, SOCK_STREAM, 0);
-    if (sockfd == -1) {
-        perror("socket");
-        exit(1);
+    // get socket path on first run
+    if (socket_path == NULL) {
+        socket_path = getenv("SWAYSOCK");
     }
 
-    memset(&addr, 0, sizeof(addr));
-    addr.sun_family = AF_UNIX;
-    strncpy(addr.sun_path, socket_path, sizeof(addr.sun_path) - 1);
+    if (sockfd == -1) {
+        sockfd = socket(AF_UNIX, SOCK_STREAM, 0);
+        if (sockfd == -1) {
+            perror("socket");
+            exit(1);
+        }
 
-    if (connect(sockfd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
-        perror("connect");
-        close(sockfd);
-        exit(1);
+        memset(&addr, 0, sizeof(addr));
+        addr.sun_family = AF_UNIX;
+        strncpy(addr.sun_path, socket_path, sizeof(addr.sun_path) - 1);
+
+        if (connect(sockfd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
+            perror("connect");
+            close(sockfd);
+            exit(1);
+        }
     }
 
     // Send "get_inputs" command to Sway
@@ -179,12 +186,16 @@ void extract_keyboard_layout(char *buffer, size_t buffer_size) {
             }
         }
     }
+
+    // flush rest of response
+    while (num_read == sizeof(read_buffer)) {
+        num_read = read(sockfd, read_buffer, sizeof(read_buffer));
+    }
     
     if (!found) {
         strncpy(buffer, "Unknown", buffer_size);
         buffer[buffer_size - 1] = 0;
     }
-    close(sockfd);
 }
 
 void print() {
