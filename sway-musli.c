@@ -203,20 +203,32 @@ void print() {
     char keyboard[MAX_BUF];
     char batcap[MAX_BUF];
     char batstat[MAX_BUF];
+    static char last_message[MAX_BUF];
+    char message[MAX_BUF];
     
     extract_wifi_ssid(wifi, sizeof(wifi));
     extract_keyboard_layout(keyboard, sizeof(keyboard));
     read_file("/sys/class/power_supply/BAT0/capacity", batcap, sizeof(batcap));
     read_file("/sys/class/power_supply/BAT0/status", batstat, sizeof(batstat));
 
-    printf("%s | %s | %s%% - %s | %s\n", wifi, keyboard, batcap, batstat, get_time_string());
+    // only print if it changed since last time
+    sprintf(message, "%s | %s | %s%% - %s | %s", wifi, keyboard, batcap, batstat, get_time_string());
+    if (strcmp(message, last_message) == 0) {
+        return;
+    }
+    strncpy(last_message, message, sizeof(last_message));
+    last_message[sizeof(last_message) - 1] = 0;
+    printf("%s\n", message);
+
     fflush(stdout);
 }
 
 void usage() {
-    printf("Usage: sway-musli [-1|--once]\n");
+    printf("Usage: sway-musli [-1|--once] [-f|--fps <FPS>]\n");
     printf(" - Print a stream of status lines to be used with swaybar.\n");
     printf(" - If passed -1 or --once, print once and exit.\n");
+    printf(" - If passed -f or --fps, print at most <FPS> times per second.\n");
+    printf("   - Default is 30.\n");
     printf(" - Example sway config:\n");
     printf("    ...\n");
     printf("    bar {\n");
@@ -239,15 +251,22 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
+  // parse fps
+  int fps = 30;
+  if (argc == 3 && (strcmp(argv[1], "-f") == 0 || strcmp(argv[1], "--fps") == 0)) {
+    fps = atoi(argv[2]);
+    argc = 1;
+  }
+
   // on any other argument, print usage and exit
   if (argc != 1) {
     usage();
     return 1;
   }
 
-
   while (1) {
     print();
-    sleep(1);
+    // run at 1second/fps
+    usleep(1000000 / fps);
   }
 }
