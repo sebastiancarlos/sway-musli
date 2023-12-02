@@ -35,21 +35,6 @@ bar {
 }
 ```
 
-## FPS?
-
-That's right. We are in high-performance territory now.
-
-By default, `sway-musli` runs at 30 frames per second, but you can change it
-with the `--fps` option.
-
-1 FPS is completely acceptable, but you might want more if you add some sort of
-dynamic content, or if you want to see keyboard layout changes reflected
-immediately.
-
-At around 60FPS, your processor might feel a slight tickle. If your bar is
-hidden by default, you might as well run it at 60 FPS because it won't run
-while the bar is hidden.
-
 ## Usage
 ```
 Usage: sway-musli [-1|--once] [-f|--fps <FPS>]
@@ -65,6 +50,21 @@ Usage: sway-musli [-1|--once] [-f|--fps <FPS>]
     ...
     # Note: Make sure sway-musli is in your PATH.
 ```
+
+## FPS?
+
+That's right. We are in high-performance territory now.
+
+By default, `sway-musli` runs at 30 frames per second, but you can change it
+with the `--fps` option.
+
+1 FPS is completely acceptable, but you might want more if you add some sort of
+dynamic content, or if you want to see keyboard layout changes reflected
+immediately.
+
+At around 60FPS, your processor might feel a slight tickle. If your bar is
+hidden by default, you might as well run it at 60 FPS because it won't run
+while the bar is hidden.
 
 ## Notes
 - Assumes your network device is `wlan0`. But you can change this in the source
