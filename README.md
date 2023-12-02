@@ -17,10 +17,10 @@
   - Supports both Sway and i3.
     - Easy to adapt to any status bar which supports text input.
 - Minimal features:
-    - Shows date and time (even seconds!).
-    - Shows battery status.
-    - Shows keyboard layout. 
     - Shows wifi connection.
+    - Shows keyboard layout.
+    - Shows battery status.
+    - Shows date and time (even seconds!).
 
 ## Installation
 1. Clone the repo and run:
