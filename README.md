@@ -7,7 +7,6 @@
 
 `MyWiFi | Colemak | 65% - Charging | Fri 2023-12-01 17:01:13`
 
-
 ## Features
 - Written in C for **ültra speed**.
 - Minimal features:
@@ -26,9 +25,23 @@ make install # if you want to have the executable in your path
 ```
 bar {
     ...
-    status_command while sway-musli; do sleep 1; done
+    status_command sway-musli
     ...
 }
+```
+
+## Usage
+```
+Usage: sway-musli [-1|--once]
+ - Print a stream of status lines to be used with swaybar.
+ - If passed -1 or --once, print once and exit.
+ - Example sway config:
+    ...
+    bar {
+        status_command sway-musli
+    }
+    ...
+    # Note: Make sure sway-musli is in your PATH.
 ```
 
 ## Notes

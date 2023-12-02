@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 #define MAX_BUF 100
-#define OUTPUT_BUF_SIZE 100 
+#define OUTPUT_BUF_SIZE 100
 
 // status-line.c
 // - Print a line containing the WIFI SSID, keyboard layout, battery capacity,
@@ -116,7 +117,7 @@ void extract_keyboard_layout(char *buffer, size_t buffer_size) {
     pclose(fp);
 }
 
-int main() {
+void print() {
     char wifi[MAX_BUF];
     char keyboard[MAX_BUF];
     char batcap[MAX_BUF];
@@ -127,7 +128,44 @@ int main() {
     read_file("/sys/class/power_supply/BAT0/capacity", batcap, sizeof(batcap));
     read_file("/sys/class/power_supply/BAT0/status", batstat, sizeof(batstat));
 
-    // Print output
     printf("%s | %s | %s%% - %s | %s\n", wifi, keyboard, batcap, batstat, get_time_string());
+    fflush(stdout);
+}
+
+void usage() {
+    printf("Usage: sway-musli [-1|--once]\n");
+    printf(" - Print a stream of status lines to be used with swaybar.\n");
+    printf(" - If passed -1 or --once, print once and exit.\n");
+    printf(" - Example sway config:\n");
+    printf("    ...\n");
+    printf("    bar {\n");
+    printf("        status_command sway-musli\n");
+    printf("    }\n");
+    printf("    ...\n");
+    printf("    # Note: Make sure sway-musli is in your PATH.\n");
+}
+
+int main(int argc, char *argv[]) {
+  // print usage on -h or --help
+  if (argc == 2 && (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0)) {
+    usage();
     return 0;
+  }
+
+  // if passed argument -1 or --once, print once and exit
+  if (argc == 2 && (strcmp(argv[1], "-1") == 0 || strcmp(argv[1], "--once") == 0)) {
+    print();
+    return 0;
+  }
+
+  // on any other argument, print usage and exit
+  if (argc != 1) {
+    usage();
+    return 1;
+  }
+
+  while (1) {
+    print();
+    sleep(1);
+  }
 }
