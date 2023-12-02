@@ -12,7 +12,7 @@
 - Written in C for **ültra speed**.
   - No dependencies. Uses sockets for communication with Sway and Linux
     subsystems.
-  - Takes **1ms** on my machine.
+  - Takes **1ms** to render on my machine.
   - Great performance even when running in **60 FPS möde**!
   - Supports both Sway and i3.
     - Easy to adapt to any status bar which supports text input.
