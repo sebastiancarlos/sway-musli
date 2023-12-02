@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include <time.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 #include <linux/wireless.h>
 
 #define IW_INTERFACE "wlan0"
@@ -78,37 +81,101 @@ void extract_wifi_ssid(char *buffer, size_t buffer_size) {
     free(id);
 }
 
+void send_sway_command(int sockfd, uint32_t command_type, const char *command) {
+    const char *magic = "i3-ipc"; // Sway IPC magic string
+    uint32_t magic_length = strlen(magic);
+    uint32_t command_size = strlen(command);
+    size_t message_size = magic_length + sizeof(command_size) + sizeof(command_type) + command_size;
+
+    // Allocate buffer for the entire message
+    char *message = malloc(message_size);
+    if (message == NULL) {
+        perror("malloc failed");
+        exit(1);
+    }
+
+    // Copy the magic string, command size, command type, and command into the buffer
+    char *buffer_ptr = message;
+    memcpy(buffer_ptr, magic, magic_length);
+    buffer_ptr += magic_length;
+    memcpy(buffer_ptr, &command_size, sizeof(command_size));
+    buffer_ptr += sizeof(command_size);
+    memcpy(buffer_ptr, &command_type, sizeof(command_type));
+    buffer_ptr += sizeof(command_type);
+    memcpy(buffer_ptr, command, command_size);
+
+    if (write(sockfd, message, message_size) != message_size) {
+        perror("write failed");
+        exit(1);
+    }
+
+    // Free the allocated buffer
+    free(message);
+}
+
 // A simple function to extract the keyboard layout from the swaymsg command output.
 void extract_keyboard_layout(char *buffer, size_t buffer_size) {
-    const char *command = "swaymsg -t get_inputs";
-    FILE *fp = popen(command, "r");
-    char line[MAX_BUF];
+    int sockfd;
+    struct sockaddr_un addr;
+    const char *socket_path = getenv("SWAYSOCK");
+    const char *get_inputs_command = "get_inputs";
+    char read_buffer[1024];
     int found = 0;
-    
-    if (fp == NULL) {
-        perror("popen");
+
+    sockfd = socket(AF_UNIX, SOCK_STREAM, 0);
+    if (sockfd == -1) {
+        perror("socket");
+        exit(1);
+    }
+
+    memset(&addr, 0, sizeof(addr));
+    addr.sun_family = AF_UNIX;
+    strncpy(addr.sun_path, socket_path, sizeof(addr.sun_path) - 1);
+
+    if (connect(sockfd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
+        perror("connect");
+        close(sockfd);
+        exit(1);
+    }
+
+    // Send "get_inputs" command to Sway
+   const uint32_t get_inputs_command_type = 100; // IPC command type for "get_inputs"
+   send_sway_command(sockfd, get_inputs_command_type, get_inputs_command);
+
+    // Read Sway's response header
+    size_t prefix_size = strlen("i3-ipc") + sizeof(uint32_t) + sizeof(uint32_t);
+    ssize_t num_read = read(sockfd, read_buffer, prefix_size);
+    if (num_read == -1) {
+        perror("read");
+        close(sockfd);
+        exit(1);
+    }
+
+    // Read Sway's response
+    num_read = read(sockfd, read_buffer, sizeof(read_buffer));
+    if (num_read == -1) {
+        perror("read");
+        close(sockfd);
         exit(1);
     }
     
-    while (fgets(line, sizeof(line), fp) && !found) {
-        char *start = strstr(line, "xkb_active_layout_name");
-        if (start) {
-            char *start_quote = strchr(start, '(');
-            char *end_quote = strrchr(start, ')');
-            if (start_quote && end_quote && start_quote < end_quote) {
-                size_t len = end_quote - start_quote - 1;
-                if (len < buffer_size) {
-                    strncpy(buffer, start_quote + 1, len);
-                    buffer[len] = 0; // Null-terminate buffer.
-                                     
-                    // if value is "US", change to "Qwerty"
-                    if (strcmp(buffer, "US") == 0) {
-                        strncpy(buffer, "Qwerty", buffer_size);
-                        buffer[buffer_size - 1] = 0;
-                    }
-
-                    found = 1;
+    char *start = strstr(read_buffer, "xkb_active_layout_name");
+    if (start) {
+        char *start_quote = strchr(start, '(');
+        char *end_quote = strchr(start_quote, ')');
+        if (start_quote && end_quote && start_quote < end_quote) {
+            size_t len = end_quote - start_quote - 1;
+            if (len < buffer_size) {
+                strncpy(buffer, start_quote + 1, len);
+                buffer[len] = 0; // Null-terminate buffer.
+                                 
+                // if value is "US", change to "Qwerty"
+                if (strcmp(buffer, "US") == 0) {
+                    strncpy(buffer, "Qwerty", buffer_size);
+                    buffer[buffer_size - 1] = 0;
                 }
+
+                found = 1;
             }
         }
     }
@@ -117,7 +184,7 @@ void extract_keyboard_layout(char *buffer, size_t buffer_size) {
         strncpy(buffer, "Unknown", buffer_size);
         buffer[buffer_size - 1] = 0;
     }
-    pclose(fp);
+    close(sockfd);
 }
 
 void print() {
