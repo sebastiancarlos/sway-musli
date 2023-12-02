@@ -12,6 +12,7 @@
 - Minimal features:
     - Shows date and time (even seconds!).
     - Shows battery status.
+    - Shows keyboard layout. 
     - Shows wifi connection.
 
 ## Installation
@@ -45,8 +46,7 @@ Usage: sway-musli [-1|--once]
 ```
 
 ## Notes
-- Depends on `iwd`.
-- Assumes your network device is `wlan0`.
+- Assumes your network device is `wlan0`. But you can change this in the source file.
 - You can take this as a sample code to help you build your personal **ültrafast** Sway status line.
 - See also, [i3status](https://manned.org/i3status.1) and [i3blocks](https://github.com/vivien/i3blocks)
 - I ate müsli with avocado while coding this. 🥣🥑

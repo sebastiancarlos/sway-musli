@@ -3,7 +3,10 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include <sys/ioctl.h>
+#include <linux/wireless.h>
 
+#define IW_INTERFACE "wlan0"
 #define MAX_BUF 100
 #define OUTPUT_BUF_SIZE 100
 
@@ -38,41 +41,35 @@ char* get_time_string() {
     return time_str;
 }
 
+// adapted from https://stackoverflow.com/a/19733653/21567639
 void extract_wifi_ssid(char *buffer, size_t buffer_size) {
-    const char *command = "sudo iwctl station wlan0 show";
-    FILE *fp = popen(command, "r");
-    char line[MAX_BUF];
-    
-    if (fp == NULL) {
-        perror("popen");
-        exit(1);
+    static int sockfd = -1;
+    char * id;
+    id = (char *)malloc(sizeof(char)*IW_ESSID_MAX_SIZE+1);
+
+    struct iwreq wreq;
+    memset(&wreq, 0, sizeof(struct iwreq));
+    wreq.u.essid.length = IW_ESSID_MAX_SIZE+1;
+
+    sprintf(wreq.ifr_name, IW_INTERFACE);
+
+    // initialize socket if it hasn't been initialized yet
+    if (sockfd == -1) {
+      if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
+          exit(1);
+      }
     }
-    
-    while (fgets(line, sizeof(line), fp)) {
-        if (strstr(line, "Connected network")) {
-           // extract SSID, which is the first non-whitespace string after "Connected network"
-           char *start = strchr(line, 'k');
-           start++; // skip 'k'
-           // skip leading whitespace
-           while (*start == ' ') {
-               start++;
-           }
-           char *end = strchr(start, ' ');
-           size_t len = end - start;
-           // print to buffer and exit
-           if (len < buffer_size) {
-               strncpy(buffer, start, len);
-               buffer[len] = 0; // Null-terminate buffer.
-               pclose(fp);
-               return;
-           }
-        }
+
+    wreq.u.essid.pointer = id;
+    if (ioctl(sockfd,SIOCGIWESSID, &wreq) == -1) {
+        fprintf(stderr, "Get ESSID ioctl failed \n");
+        exit(2);
     }
-    
-    // Set default string if SSID is not found.
-    strncpy(buffer, "No WiFi", buffer_size);
+
+    strncpy(buffer, (char *)wreq.u.essid.pointer, buffer_size);
     buffer[buffer_size - 1] = 0;
-    pclose(fp);
+
+    free(id);
 }
 
 // A simple function to extract the keyboard layout from the swaymsg command output.
@@ -163,6 +160,7 @@ int main(int argc, char *argv[]) {
     usage();
     return 1;
   }
+
 
   while (1) {
     print();
