@@ -69,6 +69,12 @@ void extract_wifi_ssid(char *buffer, size_t buffer_size) {
     strncpy(buffer, (char *)wreq.u.essid.pointer, buffer_size);
     buffer[buffer_size - 1] = 0;
 
+    // if buffer is empty, set "Not Connected" instead.
+    if (strlen(buffer) == 0) {
+        strncpy(buffer, "Not Connected", buffer_size);
+        buffer[buffer_size - 1] = 0;
+    }
+
     free(id);
 }
 
