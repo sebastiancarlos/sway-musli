@@ -9,6 +9,8 @@
 
 ## Features
 - Written in C for **ültra speed**.
+  - No dependencies. Uses sockets for communication with Sway and Linux subsystems.
+  - Takes one millisecond on my machine.
 - Minimal features:
     - Shows date and time (even seconds!).
     - Shows battery status.
