@@ -29,7 +29,7 @@ make
 make install # if you want to have the executable in your path
 ```
 
-2. Add to your sway config file:
+2. Add to your Sway/i3 config file:
 ```
 bar {
     ...
