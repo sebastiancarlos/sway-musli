@@ -13,6 +13,8 @@
     subsystems.
   - Takes **1ms** on my machine.
   - Great performance even when running in **60FPS möde**!
+  - Support both Sway and i3.
+    - Easy to adapt to any status bar which supports text input.
 - Minimal features:
     - Shows date and time (even seconds!).
     - Shows battery status.

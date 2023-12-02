@@ -125,6 +125,15 @@ void extract_keyboard_layout(char *buffer, size_t buffer_size) {
     // get socket path on first run
     if (socket_path == NULL) {
         socket_path = getenv("SWAYSOCK");
+
+        // If not found, try I3SOCK, else bail out
+        if (socket_path == NULL) {
+            socket_path = getenv("I3SOCK");
+            if (socket_path == NULL) {
+                fprintf(stderr, "SWAYSOCK or I3SOCK not set\n");
+                exit(1);
+            }
+        }
     }
 
     if (sockfd == -1) {
@@ -266,7 +275,7 @@ int main(int argc, char *argv[]) {
 
   while (1) {
     print();
-    // run at 1second/fps
+    // run at provided FPS
     usleep(1000000 / fps);
   }
 }
