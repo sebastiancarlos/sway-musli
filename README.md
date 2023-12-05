@@ -81,3 +81,6 @@ run it while the bar is hidden.
 
 ## License
 MIT
+
+Contributing
+We welcome contributions of all kinds. If you have a suggestion or fix, please feel free to open an issue or pull request.
