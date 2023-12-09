@@ -3,6 +3,9 @@
 SHELL := /usr/bin/env bash
 LN_S := ln -sf
 
+INSTALL := install
+INSTALL_PROGRAM := $(INSTALL)
+
 # Root of the installation
 prefix := /usr/local
 
@@ -42,7 +45,7 @@ all: sway-musli
 .PHONY: install
 install: installdirs
   @echo -e $(blue)Installing ...$(reset)
-  @$(LN_S) $(srcdir)/sway-musli $(DESTDIR)$(bindir)/sway-musli
+  @$(INSTALL_PROGRAM) sway-musli $(DESTDIR)$(bindir)/sway-musli
   @echo -e '   'Installing $(green)sway-musli$(reset) in $(green)$(DESTDIR)$(bindir)/$(reset)$(bold)sway-musli$(reset)
   @echo -e $(blue)Installing$(reset) $(green)DONE$(reset)
 
